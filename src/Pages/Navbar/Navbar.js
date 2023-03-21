@@ -2,9 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
+
+
   return (
     <div>
-      <div className="navbar bg-base-100">
+      <div className="navbar bg-base-200">
         <div className="navbar-start">
           <div className="dropdown">
             <label tabIndex={0} className="btn btn-ghost lg:hidden">
@@ -36,7 +38,7 @@ const Navbar = () => {
               </li>
             </ul>
           </div>
-          <Link className="btn btn-ghost normal-case text-2xl font-bold">Hero Rider</Link>
+          <Link to='/' className="btn btn-ghost normal-case text-2xl font-bold">Hero Rider</Link>
         </div>
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1">
