@@ -6,13 +6,10 @@ import { AuthContext } from "../../Context/AuthContextProvider";
 
 import SmallLoading from "../../Loading/SmallLoading";
 
-const SignUp = () => {
-  
-  const [signUpError, setSignUPError] = useState("");
+const SignUpLearner = () => {
   const { createUser, loading, setLoading } = useContext(AuthContext);
-  
+  const [signUpError, setSignUPError] = useState("");
 
-  // console.log(loading)
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
@@ -24,7 +21,6 @@ const SignUp = () => {
   } = useForm();
 
   const handleSignUp = (data) => {
-
     if (data.password !== data.confirmpassword) {
       toast.error("Your Password did not match");
       return;
@@ -36,102 +32,92 @@ const SignUp = () => {
       icon: "👏",
     });
 
-   
-
-    createUser(data.useremail, data.password)
-      .then((result) => {
-        const user = result.user;
-        console.log(user);
-
-        
-        const lience = data.userdrivinglience[0];
-        const usernid = data.usernid[0];
-        const userprofilepicture = data.userprofilepicture[0];
     
-        const key = process.env.REACT_APP_imgKey;
 
-        const formData = new FormData();
-        formData.append("image", lience);
-        const url = `https://api.imgbb.com/1/upload?key=${key}`;
-        if (formData) {
-          fetch(url, {
-            method: "POST",
-            body: formData,
-          })
-            .then((res) => res.json())
-            .then((imgData) => {
-              const licence = imgData.data.url;
 
-              formData.append("image", usernid);
-              const url = `https://api.imgbb.com/1/upload?key=${key}`;
-              if (formData) {
-                fetch(url, {
+    
+    createUser(data.useremail, data.password)
+    .then((result) => {
+      const user = result.user;
+      // console.log(user);
+
+      const usernid = data.usernid[0];
+    const userprofilepicture = data.userprofilepicture[0];
+
+    const key = process.env.REACT_APP_imgKey;
+    const formData = new FormData();
+    formData.append("image", usernid);
+    const url = `https://api.imgbb.com/1/upload?key=${key}`;
+    if (formData) {
+      fetch(url, {
+        method: "POST",
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((imgData) => {
+          const userNid = imgData.data.url;
+
+          formData.append("image", userprofilepicture);
+          const url = `https://api.imgbb.com/1/upload?key=${key}`;
+          if (formData) {
+            fetch(url, {
+              method: "POST",
+              body: formData,
+            })
+              .then((res) => res.json())
+              .then((imgData) => {
+                const userPP = imgData.data.url;
+
+                const allInfo = {
+                  userProfilePicture: userPP,
+                  userNid: userNid,
+                  userName: data.username,
+                  userEmail: data.useremail,
+                  userAge: data.userage,
+                  userAddress: data.useraddress,
+                  userPhone: data.phone,
+                  vehicaltype: data.vehicaltype,
+                  userType:"Learner"
+                };
+
+                console.log(allInfo);
+                // console.log(data)
+
+
+                // Save user information to the database
+                fetch("http://localhost:5000/users", {
                   method: "POST",
-                  body: formData,
+                  headers: {
+                    "content-type": "application/json",
+                  },
+                  body: JSON.stringify(allInfo),
                 })
                   .then((res) => res.json())
-                  .then((imgData) => {
-                    const userNid = imgData.data.url;
+                  .then((result) => {
+                    // console.log(result);
+                    toast.success("You Profile is Ready");
+                    setLoading(false);
 
-                    formData.append("image", userprofilepicture);
-                    const url = `https://api.imgbb.com/1/upload?key=${key}`;
-                    if (formData) {
-                      fetch(url, {
-                        method: "POST",
-                        body: formData,
-                      })
-                        .then((res) => res.json())
-                        .then((imgData) => {
-                          const userPP = imgData.data.url;
-
-                          const allInfo = {
-                            userProfilePicture: userPP,
-                            userNid: userNid,
-                            userLience: licence,
-                            userName: data.username,
-                            userEmail: data.useremail,
-                            userAge: data.userage,
-                            userAddress: data.useraddress,
-                            userPhone: data.phone,
-                            userArea: data.userarea,
-                            careName: data.carename,
-                            careModel: data.caremodel,
-                            careNumberPlate: data.carnumberpalate,
-                            vehicaltype: data.vehicaltype,
-                            userType: "Rider",
-                          };
-
-                          console.log(allInfo);
-                          // console.log(data)
-
-                          // Save user information to the database
-                          fetch("http://localhost:5000/users", {
-                            method: "POST",
-                            headers: {
-                              "content-type": "application/json",
-                            },
-                            body: JSON.stringify(allInfo),
-                          })
-                            .then((res) => res.json())
-                            .then((result) => {
-                              // console.log(result);
-                              toast.success("You Profile is Ready");
-                              setLoading(false);
-                              navigate(from, { replace: true });
-                            });
-                        });
-                    }
+                   navigate(from, { replace: true });
                   });
-              }
-            });
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        setLoading(false);
-        setSignUPError(error.message);
-      });
 
+                
+                
+              });
+          }
+        });
+    }
+      
+
+
+    })
+    .catch((error) => {
+      console.log(error);
+      setLoading(false);
+      setSignUPError(error.message);
+    });
+
+    
   };
 
   return (
@@ -150,13 +136,13 @@ const SignUp = () => {
         )}
 
         <h2 className="text-4xl  font-semibold text-center mb-5 text-black py-6">
-          Sign Up as a Rider
+          Sign Up as a Learner
         </h2>
-
+        
         <div className="w-full p-7">
-          <form onSubmit={handleSubmit(handleSignUp)} >
+          <form onSubmit={handleSubmit(handleSignUp)}>
             <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
-              <div className="form-control">
+              <div className="form-control w-full max-w-xs">
                 <label className="label">
                   {" "}
                   <span className="label-text text-black font-bold ">
@@ -264,48 +250,6 @@ const SignUp = () => {
               <div className="form-control w-full max-w-xs">
                 <label className="label">
                   {" "}
-                  <span className="label-text text-black font-bold ">
-                    Your Area
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  {...register("userarea", {
-                    required: "Area is Required",
-                  })}
-                  className="input  input-bordered w-full max-w-xs"
-                  placeholder="Enter your area."
-                />
-                {errors.userarea && (
-                  <p className="text-red-500">{errors.userarea.message}</p>
-                )}
-              </div>
-
-              <div className="form-control w-full max-w-xs">
-                <label className="label">
-                  {" "}
-                  <span className="label-text text-black font-bold">
-                    Driving Licence
-                  </span>
-                </label>
-                <input
-                  type="file"
-                  {...register("userdrivinglience", {
-                    required: "Photo is Required",
-                  })}
-                  className="input border-gray-300  w-full max-w-xs pt-2"
-                  required
-                />
-                {errors.userdrivinglience && (
-                  <p className="text-red-500">
-                    {errors.userdrivinglience.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="form-control w-full max-w-xs">
-                <label className="label">
-                  {" "}
                   <span className="label-text text-black font-bold">
                     NID Picture
                   </span>
@@ -341,68 +285,6 @@ const SignUp = () => {
                 {errors.userprofilepicture && (
                   <p className="text-red-500">
                     {errors.userprofilepicture.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="form-control w-full max-w-xs">
-                <label className="label">
-                  {" "}
-                  <span className="label-text text-black font-bold ">
-                    Care Name
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  {...register("carename", {
-                    required: "Care name is Required",
-                  })}
-                  className="input  input-bordered w-full max-w-xs"
-                  placeholder="Enter your car name."
-                />
-                {errors.carename && (
-                  <p className="text-red-500">{errors.carename.message}</p>
-                )}
-              </div>
-
-              <div className="form-control w-full max-w-xs">
-                <label className="label">
-                  {" "}
-                  <span className="label-text text-black font-bold ">
-                    Care Model
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  {...register("caremodel", {
-                    required: "Care model is Required",
-                  })}
-                  className="input  input-bordered w-full max-w-xs"
-                  placeholder="Enter your car model."
-                />
-                {errors.caremodel && (
-                  <p className="text-red-500">{errors.caremodel.message}</p>
-                )}
-              </div>
-
-              <div className="form-control w-full max-w-xs">
-                <label className="label">
-                  {" "}
-                  <span className="label-text text-black font-bold ">
-                    Care Number Palate
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  {...register("carnumberpalate", {
-                    required: "Care number palate is Required",
-                  })}
-                  className="input  input-bordered w-full max-w-xs"
-                  placeholder="Enter your care number palate."
-                />
-                {errors.carnumberpalate && (
-                  <p className="text-red-500">
-                    {errors.carnumberpalate.message}
                   </p>
                 )}
               </div>
@@ -489,20 +371,13 @@ const SignUp = () => {
               </div>
             </div>
 
-            <p className="italic text-center mt-10 font-bold">
-              Already Have an Account?{" "}
-              <Link to="/login" className="text-blue-600 underline">
-                Please login...
-              </Link>
-            </p>
-            <p className="italic text-center font-bold">
-              Are you a Learner?{" "}
-              <Link className="text-blue-600 underline" to="/signuplearner">
-                Please Signup as a learner...
-              </Link>
-            </p>
+            <p className="italic text-center mt-10 font-bold">Already Have an Account? <Link to='/login' className="text-blue-600 underline">Please login...</Link></p>
+            <p className="italic text-center font-bold">Are you a Learner? <Link className="text-blue-600 underline" to='/signup'>Please Signup as a learner...</Link></p>
+            
+            
 
             <div className="text-center mb-10 mt-5">
+              
               <button
                 className="btn hover:bg-gray-400 hover:text-black text-xl font-bold lg:w-1/4 bg-slate-900 text-white"
                 type="submit"
@@ -520,4 +395,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default SignUpLearner;
