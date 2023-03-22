@@ -8,7 +8,7 @@ import SmallLoading from "../../Loading/SmallLoading";
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || "/";
+  const from = location.state?.from?.pathname || "/profile";
 
   const [loginUserEmail, setLoginUserEmail] = useState("");
   // const [token] = useToken(loginUserEmail);
@@ -33,7 +33,7 @@ const Login = () => {
         
           toast.success("Login Successfully");
           setLoading(false);
-          navigate(from, { replace: true });
+          navigate('/profile');
         
       })
       .catch((error) => {
