@@ -11,16 +11,21 @@ const UserProfile = () => {
 
   useEffect(() => {
     setLoading(true);
-
+    // console.log(email)
     if (email) {
-      fetch(`http://localhost:5000/users/${email}`)
+      fetch(`http://localhost:5000/users/${email}`,{
+        headers: {
+            authorization: `bearer ${localStorage.getItem('accessToken')}`
+        }
+      })
         .then((res) => res.json())
         .then((data) => {
-          //    console.log(data)
+            //  console.log(data)
           setProfile(data);
           setLoading(false);
         });
     }
+    
   }, [email, setLoading]);
 //   console.log(profile);
 
@@ -38,8 +43,11 @@ const UserProfile = () => {
             src={profile.userProfilePicture}
             alt="Profile"
           />
+
+            {profile.UserStatus === "Block" && <p className="text-3xl text-center my-4 text-red-600 font-bold">Your Profile {profile.UserStatus}, Please communicate with your Instructor.</p>}
+
           <p className="text-2xl font-bold">Personal Information</p>
-          <div className="lg:grid lg:grid-cols-3 mt-2 ">
+          <div className="lg:grid lg:grid-cols-3 mt-2 pb-5 ">
             <p className="text-xl font-semibold">
               Name: <span className="font-normal"> {profile.userName}</span>{" "}
             </p>

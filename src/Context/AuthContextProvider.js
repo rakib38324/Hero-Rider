@@ -23,9 +23,9 @@ const AuthContextProvider = ({children}) => {
         return signInWithEmailAndPassword(auth, email, password);
     }
 
-    const updateUser = (userInfo) =>{
+    const deleteUser = (userInfo) =>{
         setLoading(true)
-        return updateProfile(auth.currentUser, userInfo);
+        return deleteUser(auth.currentUser, userInfo);
     }
 
     const logOut = () =>{
@@ -45,11 +45,17 @@ const AuthContextProvider = ({children}) => {
         return () => unsubscribe();
     }, [])
 
+
+
+
+
+
+
     const authInfo = {
         user,
         createUser,
         signIn,
-        updateUser,
+        deleteUser,
         logOut,
         loading,
         setLoading

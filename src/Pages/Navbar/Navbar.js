@@ -2,25 +2,30 @@ import React, { useContext } from "react";
 import { toast } from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../Context/AuthContextProvider";
+import useAdmin from "../../Hooks/UseAdmin";
+import useLearner from "../../Hooks/UseLearner";
 
 const Navbar = () => {
-  const { user, logOut } = useContext(AuthContext);
-  
-
+  const { user, logOut,loading, setLoading } = useContext(AuthContext);
+  const [isAdmin] = useAdmin(user?.email);
+  const [isLearner] = useLearner(user?.email);
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
 
   const handleLogOut = () => {
+    setLoading(true)
     logOut()
       .then(() => {
         localStorage.removeItem("accessToken");
         toast.success("Log Out Successfully");
 
         navigate(from, { replace: true });
+        setLoading(false)
       })
       .catch((err) => {
         console.log(err);
+        setLoading(false)
       });
   };
 
@@ -61,8 +66,18 @@ const Navbar = () => {
                   </li>
 
                   <li>
-                    <Link to='/profile' className="text-xl font-semibold">Profile</Link>
+                    <Link to="/profile" className="text-xl font-semibold">
+                      Profile
+                    </Link>
                   </li>
+
+                  {isAdmin && (
+                    <li>
+                      <Link to="/users" className="text-xl font-semibold">
+                        Users
+                      </Link>
+                    </li>
+                  )}
                 </div>
               ) : (
                 <div className="lg:flex">
@@ -77,9 +92,14 @@ const Navbar = () => {
                     </Link>
                   </li>
 
-                  <li>
-                    <Link to="/users">Users</Link>
-                  </li>
+                 
+                  {isLearner && (
+                    <li>
+                      <Link to="/courses" className="text-xl font-semibold">
+                        Courses
+                      </Link>
+                    </li>
+                  )}
                 </div>
               )}
             </ul>
@@ -101,8 +121,10 @@ const Navbar = () => {
                   </button>
                 </li>
                 <li>
-                    <Link to='/profile' className="text-xl font-semibold">Profile</Link>
-                  </li>
+                  <Link to="/profile" className="text-xl font-semibold">
+                    Profile
+                  </Link>
+                </li>
               </div>
             ) : (
               <div className="lg:flex">
@@ -119,16 +141,23 @@ const Navbar = () => {
               </div>
             )}
 
-            <li>
-              <Link to="/users" className="text-xl font-semibold">
-                Users
-              </Link>
-            </li>
+            {isAdmin && (
+              <li>
+                <Link to="/users" className="text-xl font-semibold">
+                  Users
+                </Link>
+              </li>
+            )}
+            {isLearner && (
+              <li>
+                <Link to="/courses" className="text-xl font-semibold">
+                  Courses
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
-        <div className="navbar-end">
-          <Link className="btn">Get started</Link>
-        </div>
+        
       </div>
     </div>
   );

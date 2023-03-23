@@ -3,16 +3,21 @@ import {  useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../Context/AuthContextProvider";
+import useToken from "../../Hooks/useToken";
 
 import SmallLoading from "../../Loading/SmallLoading";
 
 const SignUpLearner = () => {
-  const { createUser, loading, setLoading } = useContext(AuthContext);
+  const [ loading, setLoading] = useState();
+  const { createUser } = useContext(AuthContext);
   const [signUpError, setSignUPError] = useState("");
+
+  const [createdUserEmail, setCreatedUserEmail] = useState("");
+  const [token] = useToken(createdUserEmail);
 
   const location = useLocation();
   const navigate = useNavigate();
-  const from = location.state?.from?.pathname || "/profile";
+  const from = location.state?.from?.pathname || "/";
 
   const {
     register,
@@ -80,7 +85,7 @@ const SignUpLearner = () => {
                   userType:"Learner"
                 };
 
-                console.log(allInfo);
+                // console.log(allInfo);
                 // console.log(data)
 
 
@@ -89,6 +94,7 @@ const SignUpLearner = () => {
                   method: "POST",
                   headers: {
                     "content-type": "application/json",
+                    authorization: `bearer ${localStorage.getItem('accessToken')}`
                   },
                   body: JSON.stringify(allInfo),
                 })
@@ -96,9 +102,10 @@ const SignUpLearner = () => {
                   .then((result) => {
                     // console.log(result);
                     toast.success("You Profile is Ready");
+                    setCreatedUserEmail(data.useremail);
                     setLoading(false);
 
-                   navigate(from, { replace: true });
+                   
                   });
 
                 
@@ -120,6 +127,9 @@ const SignUpLearner = () => {
     
   };
 
+  if (token) {
+    navigate(from, { replace: true });
+  }
   return (
     <div className="bg-gray-200">
       <div>

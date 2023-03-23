@@ -3,14 +3,20 @@ import {  useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../Context/AuthContextProvider";
+import useToken from "../../Hooks/useToken";
 
 import SmallLoading from "../../Loading/SmallLoading";
 
 const SignUp = () => {
   
   const [signUpError, setSignUPError] = useState("");
-  const { createUser, loading, setLoading } = useContext(AuthContext);
+  const [loading, setLoading] = useState("");
+  const { createUser } = useContext(AuthContext);
   
+
+  const [createdUserEmail, setCreatedUserEmail] = useState("");
+  const [token] = useToken(createdUserEmail);
+  // console.log(createdUserEmail)
 
   // console.log(loading)
   const location = useLocation();
@@ -22,6 +28,8 @@ const SignUp = () => {
     formState: { errors },
     handleSubmit,
   } = useForm();
+
+ 
 
   const handleSignUp = (data) => {
 
@@ -36,12 +44,16 @@ const SignUp = () => {
       icon: "👏",
     });
 
+    
+    if (token) {
+      navigate(from, { replace: true });
+    }
    
 
     createUser(data.useremail, data.password)
       .then((result) => {
         const user = result.user;
-        console.log(user);
+        // console.log(user);
 
         
         const lience = data.userdrivinglience[0];
@@ -101,23 +113,24 @@ const SignUp = () => {
                             userType: "Rider",
                           };
 
-                          console.log(allInfo);
+                          // console.log(allInfo);
                           // console.log(data)
 
                           // Save user information to the database
                           fetch("http://localhost:5000/users", {
                             method: "POST",
                             headers: {
-                              "content-type": "application/json",
+                              "content-type": "application/json",  
                             },
                             body: JSON.stringify(allInfo),
                           })
                             .then((res) => res.json())
                             .then((result) => {
                               // console.log(result);
+                              setCreatedUserEmail(data.useremail);
                               toast.success("You Profile is Ready");
                               setLoading(false);
-                              navigate(from, { replace: true });
+                              navigate('/profile');
                             });
                         });
                     }
